@@ -30,13 +30,13 @@ OBJS = $(GOL_OBJS) $(BITBOARD_OBJS)
 all: $(GOL_EXE) $(BITBOARD_EXE)
 
 $(GOL_EXE): $(GOL_OBJS) 
-	$(LINKER) $(CFLAGS) $(LDFLAGS) $(GOL_OBJS) -o $@ 
+	$(LINKER) $(CFLAGS) $(LDFLAGS) $(GOL_OBJS) -lpthread -o $@ 
 
 $(GOL_VERIFY_EXE): $(GOL_VERIFY_OBJS) 
-	$(LINKER) $(CFLAGS) $(LDFLAGS) $(GOL_VERIFY_OBJS) -o $@ 
+	$(LINKER) $(CFLAGS) $(LDFLAGS) $(GOL_VERIFY_OBJS) -lpthread -o $@ 
 
 $(BITBOARD_EXE): $(BITBOARD_OBJS)
-	$(LINKER) $(CFLAGS) $(LDFLAGS) $(BITBOARD_OBJS) -o $@ 
+	$(LINKER) $(CFLAGS) $(LDFLAGS) $(BITBOARD_OBJS) -lpthread -o $@ 
 
 %.o: %.c
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
