@@ -23,9 +23,9 @@
 #define BOARD( __board, __i, __j )  (__board[(__i) + nrows*(__j)])
 #define INCRE_COUNT( __board, __i, __j )  (__board[(__i) + nrows*(__j)] ++)
 #define DECRE_COUNT( __board, __i, __j )  (__board[(__i) + nrows*(__j)] --)
-#define check_status(var) ((var) & (1<<(4))>>4)
-#define dead_to_alive(var) (var |=  (1 << (4)))
-#define alive_to_dead(var) (var &= ~(1 << (4))) 
+#define check_status(var) ((var) & (0x10))
+#define dead_to_alive(var) (var |=  (0x10))
+#define alive_to_dead(var) (var &= ~(0x10)) 
 #define neighbor_count( __board, __i, __j ) (__board[(__i) + nrows*(__j)] & (char)0x0f  )
 
 void *process(void *args);
@@ -100,6 +100,7 @@ char *game_of_life (char* outboard, char* inboard, const int nrows, const int nc
     //print_board(count_outboard, nrows, ncols, "count_outboard");
    
     SWAP_BOARDS(outboard, inboard);
+    memmove (outboard, inboard, nrows * ncols * sizeof (char));
   }
 
   for (i = 0; i<nrows; i++) {
@@ -135,7 +136,7 @@ void *process(void *args)
       
 
 	  if (!current_state) {
-		  if (neighbor_count == 3) {
+		  if (neighbor_count == (char) 0x03) {
 			  inorth = mod(i - 1, nrows);
 			  isouth = mod(i + 1, nrows);
 			  jwest = mod(j - 1, ncols);
@@ -153,7 +154,7 @@ void *process(void *args)
 		  }
 	  }
 	  else if (current_state) {
-		  if (neighbor_count <= 1 || neighbor_count >= 4) {
+		  if (neighbor_count <= (char) 0x01 || neighbor_count >= (char) 0x04) {
 			  inorth = mod(i - 1, nrows);
 			  isouth = mod(i + 1, nrows);
 			  jwest = mod(j - 1, ncols);
@@ -193,7 +194,7 @@ void process_first_last(char* outboard, char* inboard, const int nrows, const in
       //printf("i = %d, j = %d, north_west_count = %d\n", i, j, BOARD(count_board, inorth, jwest));
 
 	  if (!current_state) {
-		  if (neighbor_count == 3) {
+		  if (neighbor_count == (char) 0x03) {
 			  inorth = mod(i - 1, nrows);
 			  isouth = mod(i + 1, nrows);
 			  jwest = mod(j - 1, ncols);
@@ -211,7 +212,7 @@ void process_first_last(char* outboard, char* inboard, const int nrows, const in
 		  }
 	  }
 	  else if (current_state) {
-		  if (neighbor_count <= 1 || neighbor_count >= 4) {
+		  if (neighbor_count <= (char) 0x01 || neighbor_count >= (char) 0x04) {
 			  inorth = mod(i - 1, nrows);
 			  isouth = mod(i + 1, nrows);
 			  jwest = mod(j - 1, ncols);
@@ -242,12 +243,12 @@ void count_board_init(char* inboard, char* outboard, const int nrows, const int 
   for (i = 0; i < nrows; i++) {
 	  for (j = 0; j < ncols; j++) {
 		  if (BOARD(inboard, i, j) == 1) {
-			  BOARD(inboard, i, j) = (char) 0x10;
-			  BOARD(outboard, i, j) = (char) 0x10;
+			  BOARD(inboard, i, j) = 0x10;
 		  }
 	  }
   }
   
+
 
   for (i = 0; i < nrows; i++) {
 	  for (j = 0; j < ncols; j++) {
@@ -257,17 +258,19 @@ void count_board_init(char* inboard, char* outboard, const int nrows, const int 
 			  jwest = mod(j - 1, ncols);
 			  jeast = mod(j + 1, ncols);
 
-			  INCRE_COUNT(outboard, inorth, jwest);
-			  INCRE_COUNT(outboard, inorth, j);
-			  INCRE_COUNT(outboard, inorth, jeast);
-			  INCRE_COUNT(outboard, i, jwest);
-			  INCRE_COUNT(outboard, i, jeast);
-			  INCRE_COUNT(outboard, isouth, jwest);
-			  INCRE_COUNT(outboard, isouth, j);
-			  INCRE_COUNT(outboard, isouth, jeast);
+			  INCRE_COUNT(inboard, inorth, jwest);
+			  INCRE_COUNT(inboard, inorth, j);
+			  INCRE_COUNT(inboard, inorth, jeast);
+			  INCRE_COUNT(inboard, i, jwest);
+			  INCRE_COUNT(inboard, i, jeast);
+			  INCRE_COUNT(inboard, isouth, jwest);
+			  INCRE_COUNT(inboard, isouth, j);
+			  INCRE_COUNT(inboard, isouth, jeast);
 		  }
 	  }
   }
+ 
+ memcpy(outboard, inboard, nrows * ncols * sizeof (char));
 }
 
 
