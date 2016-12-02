@@ -23,7 +23,7 @@
 #define BOARD( __board, __i, __j )  (__board[(__i) + nrows*(__j)])
 #define INCRE_COUNT( __board, __i, __j )  (__board[(__i) + nrows*(__j)] ++)
 #define DECRE_COUNT( __board, __i, __j )  (__board[(__i) + nrows*(__j)] --)
-#define check_status(var) ((var) & (1<<(4)))
+#define check_status(var) ((var) & (1<<(4))>>4)
 #define dead_to_alive(var) (var |=  (1 << (4)))
 #define alive_to_dead(var) (var &= ~(1 << (4))) 
 #define neighbor_count( __board, __i, __j ) (__board[(__i) + nrows*(__j)] & (char)0x0f  )
@@ -242,8 +242,8 @@ void count_board_init(char* inboard, char* outboard, const int nrows, const int 
   for (i = 0; i < nrows; i++) {
 	  for (j = 0; j < ncols; j++) {
 		  if (BOARD(inboard, i, j) == 1) {
-			  BOARD(inboard, i, j) = 0x00010000;
-			  BOARD(outboard, i, j) = 0x00010000;
+			  BOARD(inboard, i, j) = (char) 0x10;
+			  BOARD(outboard, i, j) = (char) 0x10;
 		  }
 	  }
   }
